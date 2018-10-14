@@ -160,6 +160,20 @@ class payload_builder(singleton_instance):
             "accessTime"            :  self.__get_config_data(str, name, "accessTime"       ),    # String      0 ~ 24
         }
         return self.__remove_null_element(result_data), name
+    def build_AuthData(self, ueId):
+        name = "AuthData"
+        dict_a, name_a = self.build_AuthEpsData(ueId)
+        dict_b, name_b = self.build_AuthImsData(ueId)
+        dict_c, name_c = self.build_AuthWifiData(ueId)
+
+        result_data = {
+            name_a : dict_a,
+            name_b : dict_b,
+            name_c : dict_c,
+        }
+
+        return result_data, name
+
     def build_EpsSubsData(self, ueId):
         name        = "EpsSubsData"
         result_data = {
@@ -487,6 +501,57 @@ class payload_builder(singleton_instance):
             "barringIndicator"      : self.__get_config_data(int, name,  "barringIndicator"  ),   #   Integer 1
             "implictRegSetId"       : self.__get_config_data(int, name,  "implictRegSetId"   ),   #   Integer 1
             "disPlayName"           : self.__get_config_data(str, name,  "disPlayName"       ),   #   String  0 ~ 32
+        }
+        return self.__remove_null_element(result_data), name
+
+    def build_TasContextData(self, ueId):
+        name        = "TasContextData"
+        result_data = {
+            "volteRegStatus"        : self.__get_config_data(int, name,  "volteRegStatus"    ),
+            "volteRegTime"          : self.__get_config_data(str, name,  "volteRegTime"      ),
+            "expirationPeriod"      : self.__get_config_data(int, name,  "expirationPeriod"  ),
+            "aorContact"            : self.__get_config_data(str, name,  "aorContact"        ),
+            "audioFtag"             : self.__get_config_data(int, name,  "audioFtag"         ),
+            "videoFtag"             : self.__get_config_data(int, name,  "videoFtag"         ),
+            "mmtelFtag"             : self.__get_config_data(int, name,  "mmtelFtag"         ),
+            "volteFlag"             : self.__get_config_data(int, name,  "volteFlag"         ),
+            "sipInstance"           : self.__get_config_data(str, name,  "sipInstance"       ),
+            "userAgent"             : self.__get_config_data(str, name,  "userAgent"         ),
+            "terminalType"          : self.__get_config_data(str, name,  "terminalType"      ),
+            "modelCode"             : self.__get_config_data(str, name,  "modelCode"         ),
+            "deviceType"            : self.__get_config_data(str, name,  "deviceType"        ),
+            "netType"               : self.__get_config_data(str, name,  "netType"           ),
+            "operatorNetwork"       : self.__get_config_data(int, name,  "operatorNetwork"   ),
+            "usimMobility"          : self.__get_config_data(int, name,  "usimMobility"      ),
+            "accessNetworkInfo"     : self.__get_config_data(str, name,  "accessNetworkInfo" ),
+            "visitedNetworkInfo"    : self.__get_config_data(str, name,  "visitedNetworkInfo"),
+            "scscfName"             : self.__get_config_data(str, name,  "scscfName"         ),
+            "mcidInfo"              : self.__get_config_data(str, name,  "mcidInfo"          ),
+            "ipsecFlag"             : self.__get_config_data(int, name,  "ipsecFlag"         ),
+            "ipv6Flag"              : self.__get_config_data(int, name,  "ipv6Flag"          ),
+            "plmnId"                : self.__get_config_data(str, name,  "plmnId"            ),
+            "regiSender"            : self.__get_config_data(int, name,  "regiSender"        ),
+            "swVersion"             : self.__get_config_data(str, name,  "swVersion"         ),
+            "expireTime"            : self.__get_config_data(str, name,  "expireTime"        ),
+            "serviceInfo"           : self.__get_config_data(str, name,  "serviceInfo"       ),
+            "updateDate"            : self.__get_config_data(str, name,  "updateDate"        ),
+        }
+        return self.__remove_null_element(result_data), name
+
+    def build_TasNdubData(self, ueId):
+        name        = "TasNdubData"
+        result_data = {
+            "tasType"               : self.__get_config_data(int, name,  "tasType"          ),
+            "rccRequest"            : self.__get_config_data(int, name,  "rccRequest"       ),
+            "rccNum"                : self.__get_config_data(str, name,  "rccNum"           ),
+            "asID"                  : self.__get_config_data(str, name,  "asID"             ),
+            "callId"                : self.__get_config_data(str, name,  "callId"           ),
+            "callType"              : self.__get_config_data(int, name,  "callType"         ),
+            "accessNetwork"         : self.__get_config_data(str, name,  "accessNetwork"    ),
+            "callStatus"            : self.__get_config_data(int, name,  "callStatus"       ),
+            "expireDate"            : self.__get_config_data(str, name,  "expireDate"       ),
+            "eventId"               : self.__get_config_data(str, name,  "eventId"          ),
+            "updateDate"            : self.__get_config_data(str, name,  "updateDate"       ),
         }
         return self.__remove_null_element(result_data), name
 

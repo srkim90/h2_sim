@@ -116,11 +116,11 @@ class __mmc_api_GET_authentication_data(mmc):
         if __type == "ALL":
             pass
         elif __type == "eps":
-            __path += "?request-domain=eps"
+            __path += "?fields=authEpsData"
         elif __type == "ims":
-            __path += "?request-domain=ims"
+            __path += "?fields=authImsData"
         elif __type == "wifi":
-            __path += "?request-domain=wifi"
+            __path += "?fields=authWifiData"
         else:
             PRINT("Invalid input MMC : %s" % command)
             return
@@ -140,29 +140,13 @@ class __mmc_api_PATCH_authentication_data(mmc):
     def run(command):
         reload_config()
         __ueId   = ueId_check(command[3])
-        __type   = command[5]
+        #__type   = command[5]
         __path   = "%s/%s/authentication-data" % (ROOT_API, __ueId)
         __data   = None
-
-        if __type == "eps":
-            __path += "/eps-auth-data"
-            __data, name  = builder().build_AuthEpsData(__ueId)
-        elif __type == "ims":
-            __path += "/ims-auth-data"
-            __data, name   = builder().build_AuthImsData(__ueId)
-        elif __type == "wifi":
-            __path += "/wifi-auth-data"
-            __data, name   = builder().build_AuthWifiData(__ueId)
-        else:
-            PRINT("Invalid input MMC : %s" % command)
-            return
-
+        __data, name = builder().build_AuthData(__ueId)
         send_request(command, __path, "PATCH", __data)
         return
-mmc_append(["PATCH"                   ,  4, "send-request-authentication_data-S-PATCH"                          , None                                      ])
-mmc_append(["eps"                     ,  5, "send-request-authentication_data-S-PATCH-eps"                      , __mmc_api_PATCH_authentication_data       ])
-mmc_append(["ims"                     ,  5, "send-request-authentication_data-S-PATCH-ims"                      , __mmc_api_PATCH_authentication_data       ])
-mmc_append(["wifi"                    ,  5, "send-request-authentication_data-S-PATCH-wifi"                     , __mmc_api_PATCH_authentication_data       ])
+mmc_append(["PATCH"                   ,  4, "send-request-authentication_data-S-PATCH"                          , __mmc_api_PATCH_authentication_data       ])
 ''' end of API '''
 
 
@@ -374,6 +358,8 @@ mmc_append(["cscf_restore_data"       ,  5, "send-request-ims_am_data-S-DELETE-c
 
 
 ''' 5. Operation : location_data '''
+
+#{CommLocationData} , {CsLocationData}, {PsLocationData}, {EpsLocationData}, {ImsLocationData}, {AsLocationData}
 class __mmc_api_GET_location_data(mmc):
     @staticmethod
     def run(command):
@@ -403,21 +389,21 @@ class __mmc_api_GET_location_data(mmc):
                 __mask += '5'
 
         if __mask != "":
-            __path += "?request-domain="
+            __path += "?fields="
 
         for i in __mask:
             if i == '1':
-                __path += "cs&"
+                __path += "/CsLocationData,"
             elif i == '2':
-                __path += "ps&"
+                __path += "/PsLocationData,"
             elif i == '3':
-                __path += "eps&"
+                __path += "/EpsLocationData,"
             elif i == '4':
-                __path += "ims&"
+                __path += "/ImsLocationData,"
             elif i == '5':
-                __path += "as&"
+                __path += "/AsLocationData,"
  
-        if __path[-1] == '&':
+        if __path[-1] == ',':
             __path = __path[0:-1]
 
         send_request(command, __path, "GET", None)
@@ -534,25 +520,29 @@ class __mmc_api_GET_supplement_service_data(mmc):
                 __mask += '4'
             if item == "VirtualServiceData":
                 __mask += '5'
+            if item == "BSGServiceData":
+                __mask += '6'
 
         if __mask != "":
-            __path += "?ss-data="
+            __path += "?fields="
 
         for i in __mask:
             if i == '0':
-                __path += "bsgsvc&"
+                __path += "/BasicServiceData,"
             elif i == '1':
-                __path += "cfsvc&"
+                __path += "/CFServiceData,"
             elif i == '2':
-                __path += "sndsvc&"
+                __path += "/SNDServiceData,"
             elif i == '3':
-                __path += "imssvc&"
+                __path += "/ImsServiceData,"
             elif i == '4':
-                __path += "insvc&"
+                __path += "/InServiceData,"
             elif i == '5':
-                __path += "vtsvc&"
- 
-        if __path[-1] == '&':
+                __path += "/VirtualServiceData,"
+            elif i == '6':
+                __path += "/BSGServiceData,"
+
+        if __path[-1] == ',':
             __path = __path[0:-1]
 
         send_request(command, __path, "GET", None)
@@ -570,6 +560,7 @@ mmc_append(["SNDServiceData"          ,  6, "send-request-supplement_service_dat
 mmc_append(["ImsServiceData"          ,  6, "send-request-supplement_service_data-S-GET-SELECT-ImsServiceData"      , __mmc_api_GET_supplement_service_data      ])
 mmc_append(["InServiceData"           ,  6, "send-request-supplement_service_data-S-GET-SELECT-InServiceData"       , __mmc_api_GET_supplement_service_data      ])
 mmc_append(["VirtualServiceData"      ,  6, "send-request-supplement_service_data-S-GET-SELECT-VirtualServiceData"  , __mmc_api_GET_supplement_service_data      ])
+mmc_append(["BSGServiceData"          ,  6, "send-request-supplement_service_data-S-GET-SELECT-BSGServiceData    "  , __mmc_api_GET_supplement_service_data      ])
 mmc_append(["__bit_flags"             ,  6, "send-request-supplement_service_data-S-GET-BITMASK-S"                  , __mmc_api_GET_supplement_service_data      ])
 
 class __mmc_api_PATCH_supplement_service_data(mmc):
@@ -613,4 +604,117 @@ mmc_append(["SNDServiceData"        ,  5, "send-request-supplement_service_data-
 mmc_append(["ImsServiceData"        ,  5, "send-request-supplement_service_data-S-PATCH-ImsServiceData"         , __mmc_api_PATCH_supplement_service_data    ])
 mmc_append(["InServiceData"         ,  5, "send-request-supplement_service_data-S-PATCH-InServiceData"          , __mmc_api_PATCH_supplement_service_data    ])
 mmc_append(["VirtualServiceData"    ,  5, "send-request-supplement_service_data-S-PATCH-VirtualServiceData"     , __mmc_api_PATCH_supplement_service_data    ])
+
+
+''' 7. Operation : TAS Service Data '''
+class __mmc_api_GET_TAS_data(mmc):
+    @staticmethod
+    def run(command):
+        reload_config()
+        __ueId    = ueId_check(command[3])
+        __type    = command[5]
+        __mask    = ""
+        __path    = "%s/%s/tas-sm-data" % (ROOT_API, __ueId)
+
+        if __type == "fields":
+            __sub_type    = command[6]
+            if __sub_type == "TasContextData":
+                __path += "?fields="
+                __path += "/TasContextData"
+            elif __sub_type == "TasNdubData":
+                __path += "?fields="
+                __path += "/TasNdubData"
+            else:
+                pass
+                #__path += "?fields="
+                #__path += "/TasContextData,/TasNdubData"
+        elif __type == "tas_context_data":
+            __path += "/tas-context-data"
+        else:
+            __path += "/tas-ndub-data"
+            if command[6] != "ALL":
+                __path += "/" + command[7]
+
+        send_request(command, __path, "GET", None)
+        return
+mmc_append(["tas_data"        ,  2, "send-request-tas_data"                                      , None                         ])
+mmc_append(["ueId"            ,  3, "send-request-tas_data-S"                                    , None                         ])
+mmc_append(["GET"             ,  4, "send-request-tas_data-S-GET"                                , None                         ])
+mmc_append(["fields"          ,  5, "send-request-tas_data-S-GET-fields"                         , None                         ])
+#mmc_append(["TasContextData"  ,  6, "send-request-tas_data-S-GET-fields-TasContextData"          , __mmc_api_GET_TAS_data       ])
+#mmc_append(["TasNdubData"     ,  6, "send-request-tas_data-S-GET-fields-TasNdubData"             , __mmc_api_GET_TAS_data       ])
+mmc_append(["ALL"             ,  6, "send-request-tas_data-S-GET-fields-ALL"                     , __mmc_api_GET_TAS_data       ])
+mmc_append(["tas_context_data",  5, "send-request-tas_data-S-GET-tas_context_data"               , __mmc_api_GET_TAS_data       ])
+mmc_append(["tas_ndub_data"   ,  5, "send-request-tas_data-S-GET-tas_ndub_data"                  , None                         ])
+mmc_append(["ALL"             ,  6, "send-request-tas_data-S-GET-tas_ndub_data-ALL"              , __mmc_api_GET_TAS_data       ])
+mmc_append(["targetId"        ,  6, "send-request-tas_data-S-GET-tas_ndub_data-targetId"         , None                         ])
+mmc_append(["targetId"        ,  7, "send-request-tas_data-S-GET-tas_ndub_data-targetId-S"       , __mmc_api_GET_TAS_data       ])
+
+class __mmc_api_POST_TAS_data(mmc):
+    @staticmethod
+    def run(command):
+        reload_config()
+        __ueId     = ueId_check(command[3])
+        __targetId = command[7]
+        __path     = "%s/%s/tas-sm-data/tas-ndub-data/%s" % (ROOT_API, __ueId, __targetId)
+
+        __data, name   = builder().build_TasNdubData(__ueId)
+        send_request(command, __path, "POST", __data)
+        return
+
+mmc_append(["POST"            ,  4, "send-request-tas_data-S-POST"                                , None                         ])
+mmc_append(["tas_ndub_data"   ,  5, "send-request-tas_data-S-POST-tas_ndub_data"                  , None                         ])
+mmc_append(["targetId"        ,  6, "send-request-tas_data-S-POST-tas_ndub_data-targetId"         , None                         ])
+mmc_append(["targetId"        ,  7, "send-request-tas_data-S-POST-tas_ndub_data-targetId-S"       , __mmc_api_POST_TAS_data      ])
+
+class __mmc_api_PATCH_TAS_data(mmc):
+    @staticmethod
+    def run(command):
+        reload_config()
+        __ueId     = ueId_check(command[3])
+        __type     = ueId_check(command[5])
+    
+        if __type == "tas_ndub_data":
+            __targetId = command[7]
+            __path     = "%s/%s/tas-sm-data/tas-ndub-data/%s" % (ROOT_API, __ueId, __targetId)
+            __data, name   = builder().build_TasNdubData(__ueId)
+        elif __type == "tas_context_data":
+            __path     = "%s/%s/tas-sm-data/tas-context-data" % (ROOT_API, __ueId)
+            __data, name   = builder().build_TasContextData(__ueId)
+
+        send_request(command, __path, "PATCH", __data)
+        return
+
+mmc_append(["PATCH"           ,  4, "send-request-tas_data-S-PATCH"                                , None                         ])
+mmc_append(["tas_context_data",  5, "send-request-tas_data-S-PATCH-tas_context_data"               , __mmc_api_PATCH_TAS_data     ])
+mmc_append(["tas_ndub_data"   ,  5, "send-request-tas_data-S-PATCH-tas_ndub_data"                  , None                         ])
+mmc_append(["targetId"        ,  6, "send-request-tas_data-S-PATCH-tas_ndub_data-targetId"         , None                         ])
+mmc_append(["targetId"        ,  7, "send-request-tas_data-S-PATCH-tas_ndub_data-targetId-S"       , __mmc_api_PATCH_TAS_data     ])
+
+
+class __mmc_api_DELETE_TAS_data(mmc):
+    @staticmethod
+    def run(command):
+        reload_config()
+        __ueId     = ueId_check(command[3])
+        __type     = ueId_check(command[6])
+        __path     = "%s/%s/tas-sm-data/tas-ndub-data" % (ROOT_API, __ueId)
+
+        if __type == "targetId":
+            __targetId = "/" + command[7]
+            __path    += __targetId
+
+        send_request(command, __path, "DELETE", None)
+        return
+
+mmc_append(["DELETE"          ,  4, "send-request-tas_data-S-DELETE"                                , None                         ])
+mmc_append(["tas_ndub_data"   ,  5, "send-request-tas_data-S-DELETE-tas_ndub_data"                  , None                         ])
+mmc_append(["ALL"             ,  6, "send-request-tas_data-S-DELETE-tas_ndub_data-ALL"              , __mmc_api_DELETE_TAS_data    ])
+mmc_append(["targetId"        ,  6, "send-request-tas_data-S-DELETE-tas_ndub_data-targetId"         , None                         ])
+mmc_append(["targetId"        ,  7, "send-request-tas_data-S-DELETE-tas_ndub_data-targetId-S"       , __mmc_api_DELETE_TAS_data    ])
+
+
+
+
+
 ''' end of API '''
