@@ -184,7 +184,7 @@ class __mmc_help(mmc):
         HELP_PRINT("send request location_data {ueId} GET SELECT EpsLocationData", tab=2)
         HELP_PRINT("send request location_data {ueId} GET SELECT ImsLocationData", tab=2)
         HELP_PRINT("send request location_data {ueId} GET SELECT AsLocationData", tab=2)
-        HELP_PRINT("send request location_data {ueId} GET BITMASK 12345", tab=2)
+        HELP_PRINT("send request location_data {ueId} GET BITMASK 1234", tab=2)
         HELP_PRINT("send request location_data {ueId} PATCH ALL", tab=2)
         HELP_PRINT("send request location_data {ueId} PATCH SELECT CommLocationData", tab=2)
         HELP_PRINT("send request location_data {ueId} PATCH SELECT CsLocationData", tab=2)
