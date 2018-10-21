@@ -17,6 +17,8 @@
 import socket
 import ssl
 
+ssl._create_default_https_context = ssl._create_unverified_context
+
 class h2_TLS:
     ctx = None
     tls_conn = None
@@ -27,7 +29,10 @@ class h2_TLS:
         self.client_key     = client_key
         self.client_side    = client_side
 
-        ctx = self.__get_http2_ssl_context()
+        #self.ctx = self.__get_http2_ssl_context()
+
+
+        self.__get_http2_ssl_context()
 
     def __get_http2_ssl_context(self):
         """
@@ -37,19 +42,20 @@ class h2_TLS:
         """
         # Get the basic context from the standard library.
         if self.client_side == False:
-            ctx = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+            self.ctx = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
         else:
-            ctx = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=self.server_cert)
+            #self.ctx = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=self.server_cert)
+            self.ctx = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
 
         # RFC 7540 Section 9.2: Implementations of HTTP/2 MUST use TLS version 1.2
         # or higher. Disable TLS 1.1 and lower.
-        ctx.options |= (
+        self.ctx.options |= (
             ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
         )
 
         # RFC 7540 Section 9.2.1: A deployment of HTTP/2 over TLS 1.2 MUST disable
         # compression.
-        ctx.options |= ssl.OP_NO_COMPRESSION
+        self.ctx.options |= ssl.OP_NO_COMPRESSION
 
         # RFC 7540 Section 9.2.2: "deployments of HTTP/2 that use TLS 1.2 MUST
         # support TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256". In practice, the
@@ -58,29 +64,33 @@ class h2_TLS:
 
 
         if self.client_side == False:
-            ctx.load_cert_chain(certfile=self.server_cert, keyfile=self.server_key)
+            self.ctx.load_cert_chain(certfile=self.server_cert, keyfile=self.server_key)
+            self.ctx.load_verify_locations(cafile=self.client_certs)                
         else:
-            ctx.load_cert_chain(certfile=self.client_certs, keyfile=self.client_key)
+            self.ctx.load_cert_chain(certfile=self.client_certs, keyfile=self.client_key)
+            self.ctx.load_verify_locations(cafile=self.client_certs)                
+            pass
 
-        ctx.load_verify_locations(cafile=self.client_certs)                
+
 
         # We want to negotiate using NPN and ALPN. ALPN is mandatory, but NPN may
         # be absent, so allow that. This setup allows for negotiation of HTTP/1.1.
-        ctx.set_alpn_protocols(["h2", "http/1.1"])
+        self.ctx.set_alpn_protocols(["h2", "http/1.1"])
 
         try:
-            ctx.set_npn_protocols(["h2", "http/1.1"])
-        except NotImplementedError:
+            self.ctx.set_npn_protocols(["h2", "http/1.1"])
+        except NotImplementedError as e:
+            print("TLS Error: NotImplementedError=%s" % (e))
             pass
 
-        self.ctx = ctx
+        #self.ctx = ctx
 
         return True
 
     def getTlsConn(self, ):
         return self.tls_conn 
 
-    def negotiate_tls(self, tcp_sock):
+    def negotiate_tls(self, tcp_sock, peer_ipaddr):
         """
         Given an established TCP connection and a HTTP/2-appropriate TLS context,
         this function:
@@ -94,22 +104,39 @@ class h2_TLS:
             if self.client_side == False:
                 self.tls_conn = self.ctx.wrap_socket(tcp_sock, server_side=True)
             else:
-                self.tls_conn = self.ctx.wrap_socket(tcp_sock, server_hostname='None')
-
+                self.tls_conn = self.ctx.wrap_socket(tcp_sock, server_hostname=peer_ipaddr)
+        except Exception as e:
+            print("Fail to create tls connection1!! : client_side=%s, Err=%s" % (self.client_side, e))
+            return None
+	
             # Always prefer the result from ALPN to that from NPN.
             # You can only check what protocol was negotiated once the handshake is
             # complete.
+        try:
             negotiated_protocol = self.tls_conn.selected_alpn_protocol()
             if negotiated_protocol is None:
                 negotiated_protocol = self.tls_conn.selected_npn_protocol()
 
             if negotiated_protocol != "h2":
+                print("Err. negotiated_protocol=%s" % (negotiated_protocol))
                 raise RuntimeError("Didn't negotiate HTTP/2!")
-        except:
+        except Exception as e:
+            print("Fail to create tls connection2!! : %s" % (e))
             return None
         return self.tls_conn
             
-
+    def getHost(self, ip):
+        """
+        This method returns the 'True Host' name for a
+        given IP address
+        """
+        try:
+            data = socket.gethostbyaddr(ip)
+            host = repr(data[0])
+            return host
+        except Exception:
+            # fail gracefully
+            return ip
 
 
 

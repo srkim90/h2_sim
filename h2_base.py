@@ -471,7 +471,7 @@ class h2_base:
 
     def h2ServerRecvTh(self, __sock, invorkCallback ):
         self._h2_set_stat(h2_conn_type.CONNTYPE_SERVER,  1)
-        self.h2RecvProc(__sock, invorkCallback, False, h2_conn_type.CONNTYPE_SERVER, -1)
+        self.h2RecvProc(__sock, invorkCallback, False, h2_conn_type.CONNTYPE_SERVER, -1, None)
         self._h2_set_stat(h2_conn_type.CONNTYPE_SERVER, -1)
 
     def h2ClientRecvTh(self, invorkCallback, IpAddr, Port, conn_type, th_index, src_ipaddr ):
@@ -490,10 +490,10 @@ class h2_base:
                         return
                 continue
             self._h2_set_stat(conn_type,   1)
-            self.h2RecvProc(sock, invorkCallback, True, conn_type, th_index)
+            self.h2RecvProc(sock, invorkCallback, True, conn_type, th_index, IpAddr)
             self._h2_set_stat(conn_type,  -1)
 
-    def h2RecvProc(self, __sock, callback, client_side, conn_type, th_index):
+    def h2RecvProc(self, __sock, callback, client_side, conn_type, th_index, IpAddr):
         global enable_ping
         n_wait_select       = 0.0
         select_timer        = 0.1
@@ -515,8 +515,10 @@ class h2_base:
 
         if(self.isTls == True):
             sslObj = h2_TLS(self.server_cert, self.server_key, self.client_certs, self.client_key, client_side)
-            sock = sslObj.negotiate_tls(__sock)
+            sock = sslObj.negotiate_tls(__sock, IpAddr)
             if sock == None:
+                print("Error!! Fail to Open TLS Session")
+                sleep(1.0)
                 return
             scheme  = "HTTPS"
             _scheme = "https"

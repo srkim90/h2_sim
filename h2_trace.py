@@ -218,6 +218,7 @@ class h2_trace(singleton_instance):
         self.fn_print("%s" % line80)
         s_data = data.split('\n')
         for item in s_data:
+            item = h2_string_decoding(item)
             self.fn_print("%s" % (item))
         self.fn_print("%s" % LINE80)
 

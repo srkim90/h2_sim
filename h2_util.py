@@ -81,3 +81,20 @@ def h2_method_validation(method):
     if method == "PATCH":
         return True , ""
     return False, "Invalid method string : %s" % method
+
+def h2_string_decoding(in_str):
+    out_str = None
+    try:
+        out_str = in_str.decode('utf-8')
+        return out_str
+    except:
+        pass
+
+    try:
+        out_str = in_str.decode('euc-kr')
+        return out_str
+    except:
+        pass
+
+    return "Unknown-String"
+
