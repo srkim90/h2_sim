@@ -42,10 +42,12 @@ class h2_TLS:
         """
         # Get the basic context from the standard library.
         if self.client_side == False:
-            self.ctx = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+            #self.ctx = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+            self.ctx = ssl._create_unverified_context()
         else:
             #self.ctx = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=self.server_cert)
-            self.ctx = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
+            #self.ctx = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
+            self.ctx = ssl._create_unverified_context()
 
         # RFC 7540 Section 9.2: Implementations of HTTP/2 MUST use TLS version 1.2
         # or higher. Disable TLS 1.1 and lower.
