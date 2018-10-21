@@ -309,11 +309,14 @@ class h2_base:
             elif tag == ":status":
                 rCode = int(value)
 
-        if fGzip == True:
-            self.printFn ("TODO: Add Decompress code for gzip")
-        elif fDeflate == True:
-            fData = zlib.decompress(fData)
-
+        try:
+            if fGzip == True:
+                self.printFn ("TODO: Add Decompress code for gzip")
+            elif fDeflate == True:
+                fData = zlib.decompress(fData)
+        except Exception as e:
+            self.printFn("Err. Invalid Data Decompress: fGzip=%s, fDeflate=%s" % (fGzip, fDeflate))
+            return None
 
         if fData != None:
             try:
@@ -666,7 +669,10 @@ class h2_base:
 
                 global perf_mode
                 if perf_mode != True:
-                    self.traceFn(event=event)
+                    try:
+                        self.traceFn(event=event)
+                    except:
+                        pass
                 if isinstance(event, h2.events.RequestReceived) or isinstance(event, h2.events.ResponseReceived) :
                     frame_ctx["headers_%d" % (event.stream_id)] = event.headers
                 if isinstance(event, h2.events.PingAcknowledged):
@@ -703,7 +709,8 @@ class h2_base:
                         #print("Send increment_flow_control_window!!")
                     
                     #print("n_remain_window:%d , n_sizeof_window:%d" % (n_remain_window, n_sizeof_window))
-                    http2_connection.increment_flow_control_window(len(event.data), None)
+                    if len(event.data) > 0:
+                        http2_connection.increment_flow_control_window(len(event.data), None)
 
                     data_to_send = http2_connection.data_to_send()
                     if data_to_send:
@@ -987,7 +994,7 @@ class h2_base:
 
         header.append(h2_base.get_head_tuple_by_name(':path', path))
         header.append(h2_base.get_head_tuple_by_name('accept', '*/*'))
-        header.append(h2_base.get_head_tuple_by_name('accept-encoding', 'gzip, deflate'))
+        #header.append(h2_base.get_head_tuple_by_name('accept-encoding', 'gzip, deflate'))
         header.append(h2_base.get_head_tuple_by_name('user-agent', stack_name))
 
         #SET_TIMEIT(l_timeit)
