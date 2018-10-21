@@ -279,7 +279,13 @@ class sa_log(singleton_instance):
 
     def PRINT(self, log_string):
         if self.is_visible_log == True:
-            print("" + log_string)
+            while True:
+                try:
+                    print("" + log_string)
+                except:
+                    sleep(0.2)
+                    continue
+                break    
             #self.print_list.append(log_string)
             self.LOG(LOG_CRT, log_string)
 

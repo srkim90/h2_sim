@@ -219,6 +219,7 @@ class __mmc_help(mmc):
         HELP_PRINT("send request tas_data {ueId} PATCH tas_ndub_data targetId {targetId}", tab=2)
         HELP_PRINT("send request tas_data {ueId} DELETE tas_ndub_data ALL", tab=2)
         HELP_PRINT("send request tas_data {ueId} DELETE tas_ndub_data targetId {targetId}", tab=2)
+        HELP_PRINT("send request manual GET / NULL", tab=2)
 
 
 
