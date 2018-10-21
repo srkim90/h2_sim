@@ -61,6 +61,30 @@ def h2_frame_type_string(frame_type):
     else:
         return "UNKNOWN_FRAME_TYPE"
 
+HEADER_TABLE_SIZE = 0x01
+ENABLE_PUSH = 0x02
+MAX_CONCURRENT_STREAMS = 0x03
+INITIAL_WINDOW_SIZE = 0x04
+MAX_FRAME_SIZE = 0x05
+MAX_HEADER_LIST_SIZE = 0x06
+
+
+def h2_setting_string(enum_setting):
+    if enum_setting == HEADER_TABLE_SIZE:
+        return "HEADER_TABLE_SIZE"
+    elif enum_setting == ENABLE_PUSH:
+        return "ENABLE_PUSH"
+    elif enum_setting == MAX_CONCURRENT_STREAMS:
+        return "MAX_CONCURRENT_STREAMS"
+    elif enum_setting == INITIAL_WINDOW_SIZE:
+        return "INITIAL_WINDOW_SIZE"
+    elif enum_setting == MAX_FRAME_SIZE:
+        return "MAX_FRAME_SIZE"
+    elif enum_setting == MAX_HEADER_LIST_SIZE:
+        return "MAX_HEADER_LIST_SIZE"
+    else:
+        return "?? Setting Item"
+
 def h2_method_validation(method):
     if method == "GET":
         return True , ""

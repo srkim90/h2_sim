@@ -43,6 +43,18 @@ from proc_pool import *
 from concurrent.futures import ProcessPoolExecutor 
 #from perf import h2_perf
 from dispatch_parse import *
+from hyperframe.exceptions import InvalidPaddingError
+from hyperframe.frame import (
+    GoAwayFrame, WindowUpdateFrame, HeadersFrame, DataFrame, PingFrame,
+    PushPromiseFrame, SettingsFrame, RstStreamFrame, PriorityFrame,
+    ContinuationFrame, AltSvcFrame, ExtensionFrame
+)
+
+from h2.exceptions import (                                                  
+    ProtocolError, NoSuchStreamError, FlowControlError, FrameTooLargeError,
+    TooManyStreamsError, StreamClosedError, StreamIDTooLowError,           
+    NoAvailableStreamIDError, RFC1122Error, DenialOfServiceError           
+)                                                                          
 
 def enum(**enums):
     return type('Enum', (), enums)
@@ -83,15 +95,45 @@ def my_print(s):
     print(s)
 
 class neoH2Connection(h2.connection.H2Connection):
-
+    n_inbound_setting = 0
     def __init__(self, connection_id, config=None):
         self.connection_id = connection_id
         self.trace         = h2_trace.getinstance()
         super(neoH2Connection, self).__init__(config)
 
     def _receive_frame(self, frame):
-        self.trace.h2_frame_trace(TRACE_DIR_RECV, frame)
+        is_magic = False
+        if frame.type == FRAME_TYPE_SETTINGS:
+            if self.n_inbound_setting == 0 and self.config.client_side == False:
+                is_magic = True
+            self.n_inbound_setting += 1
+
+        self.trace.h2_frame_trace(TRACE_DIR_RECV, frame, is_magic=is_magic)
         return super(neoH2Connection, self)._receive_frame(frame)
+
+    def initiate_connection(self):
+        """
+        Provides any data that needs to be sent at the start of the connection.
+        Must be called for both clients and servers.
+        """
+        is_magic = False
+        self.config.logger.debug("Initializing connection")
+        self.state_machine.process_input(h2.connection.ConnectionInputs.SEND_SETTINGS)
+        if self.config.client_side:
+            is_magic = True
+            preamble = b'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n'
+        else:
+            preamble = b''
+
+        f = SettingsFrame(0)
+        for setting, value in self.local_settings.items():
+            f.settings[setting] = value
+        self.config.logger.debug(
+            "Send Settings frame: %s", self.local_settings
+        )
+        self.trace.h2_frame_trace(TRACE_DIR_SEND, f, is_preface=True, is_magic=is_magic)
+
+        self._data_to_send += preamble + f.serialize()
 
     def _prepare_for_sending(self, frames):
         for frame in frames:

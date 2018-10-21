@@ -73,7 +73,7 @@ def main():
     tps_cfg  = cfg.getTpsCfg()
     n_conn   = tps_cfg[5]
     is_trace = tps_cfg[6]
-    if n_conn != 1:
+    if n_conn > 1:
         mmc_set_connection_count.run([None, "notify_conn",  n_conn] )
         mmc_set_connection_count.run([None, "request_conn", n_conn]  )
     if is_trace != "ON":

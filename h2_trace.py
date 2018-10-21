@@ -75,7 +75,7 @@ class h2_trace(singleton_instance):
         self.log = sa_log.getinstance()
         self.fn_print = fn_print
 
-    def h2_frame_trace(self, direction, frame):
+    def h2_frame_trace(self, direction, frame, is_preface=False, is_magic=False):
 
         if self.log.is_trace_log == False:
             return
@@ -101,34 +101,44 @@ class h2_trace(singleton_instance):
             #pass
         elif n_frame_type == FRAME_TYPE_PRIORITY:
             return
-        elif n_frame_type == FRAME_TYPE_RST_STREAM:
+        elif n_frame_type == FRAME_TYPE_SETTINGS:
+            if "ACK" in frame.flags:
+                return
             data_list.append("%s" % (line80))
-            data_list.append("%-20s: %s" % ("error_code", frame.error_code))
+            if is_preface == True and is_magic == True:
+                data_list.append("PRI * HTTP/2.0\\r\\n\\r\\nSM\\r\\n\\r\\n")
+                data_list.append("%s" % (line80))
+            for key in frame.settings.keys():
+                item = frame.settings[key]
+                data_list.append("%-24s: %s" % (h2_setting_string(key), item))
             data_list.append("%s" % (LINE80))
             pass
-        elif n_frame_type == FRAME_TYPE_SETTINGS:
-            return
+        elif n_frame_type == FRAME_TYPE_RST_STREAM:
+            data_list.append("%s" % (line80))
+            data_list.append("%-24s: %s" % ("error_code", frame.error_code))
+            data_list.append("%s" % (LINE80))
+            pass
         elif n_frame_type == FRAME_TYPE_PUSH_PROMISE:
             data_list.append("%s" % (line80))
             if len(frame.flags) > 0:
                 data_list.append("[flags]")
                 for flag_at in frame.flags:
                     data_list.append("  %-18s: %s" % (flag_at, "SET"))
-            data_list.append("%-20s: %s" % ("promised_stream_id", frame.promised_stream_id))
+            data_list.append("%-24s: %s" % ("promised_stream_id", frame.promised_stream_id))
             data_list.append("%s" % (LINE80))
             pass
         elif n_frame_type == FRAME_TYPE_PING:
             return
         elif n_frame_type == FRAME_TYPE_GOAWAY:
             data_list.append("%s" % (line80))
-            data_list.append("%-20s: %s" % ("last_stream_id", frame.last_stream_id))
-            data_list.append("%-20s: %s" % ("error_code", frame.error_code))
-            data_list.append("%-20s: %s" % ("additional_data", frame.additional_data))
+            data_list.append("%-24s: %s" % ("last_stream_id", frame.last_stream_id))
+            data_list.append("%-24s: %s" % ("error_code", frame.error_code))
+            data_list.append("%-24s: %s" % ("additional_data", frame.additional_data))
             data_list.append("%s" % (LINE80))
             pass
         elif n_frame_type == FRAME_TYPE_WINDOW_UPDATE:
             data_list.append("%s" % (line80))
-            data_list.append("%-20s: %s" % ("window_increment", frame.window_increment))
+            data_list.append("%-24s: %s" % ("window_increment", frame.window_increment))
             data_list.append("%s" % (LINE80))
             pass
         elif n_frame_type == FRAME_TYPE_CONTINUATION:
@@ -144,6 +154,11 @@ class h2_trace(singleton_instance):
             return
            
         frame_name = h2_frame_type_string(n_frame_type)
+        
+        if is_magic == True and n_frame_type == FRAME_TYPE_SETTINGS:
+            frame_name  = "%s%sMagic%s + " % (C_BOLD, C_CYAN, C_END) +  frame_name
+        #if is_preface == True and n_frame_type == FRAME_TYPE_SETTINGS:
+        #    frame_name += ", As Preface"
 
         self.fn_print("%s" % LINE80)
         self.fn_print("%s Frame %s (stream_id=%d)" % (direction, frame_name, frame.stream_id))
