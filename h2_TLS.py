@@ -17,8 +17,6 @@
 import socket
 import ssl
 
-ssl._create_default_https_context = ssl._create_unverified_context
-
 class h2_TLS:
     ctx = None
     tls_conn = None
@@ -108,7 +106,7 @@ class h2_TLS:
             else:
                 self.tls_conn = self.ctx.wrap_socket(tcp_sock, server_hostname=peer_ipaddr)
         except Exception as e:
-            print("Fail to create tls connection1!! : client_side=%s, Err=%s" % (self.client_side, e))
+            #print("Fail to create tls connection1!! : client_side=%s, Err=%s" % (self.client_side, e))
             return None
 	
             # Always prefer the result from ALPN to that from NPN.
