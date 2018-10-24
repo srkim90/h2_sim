@@ -123,6 +123,12 @@ class h2_TLS:
         except Exception as e:
             print("Fail to create tls connection2!! : %s" % (e))
             return None
+        
+        #print("%s" % self.ctx.client_random())
+        #print("%s" % ssl.Connection.client_random())
+        #print(self.tls_conn._sslobj.SSL_get_client_random())
+        #print(self.ctx.SSL_get_client_random())
+
         return self.tls_conn
             
     def getHost(self, ip):

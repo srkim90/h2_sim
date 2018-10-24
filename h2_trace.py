@@ -106,7 +106,7 @@ class h2_trace(singleton_instance):
                 return
             data_list.append("%s" % (line80))
             if is_preface == True and is_magic == True:
-                data_list.append("PRI * HTTP/2.0\\r\\n\\r\\nSM\\r\\n\\r\\n")
+                data_list.append("%s%sPRI * HTTP/2.0\\r\\n\\r\\nSM\\r\\n\\r\\n%s" % (C_BOLD, C_CYAN, C_END))
                 data_list.append("%s" % (line80))
             for key in frame.settings.keys():
                 item = frame.settings[key]

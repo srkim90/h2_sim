@@ -19,6 +19,7 @@ import ssl
 import sys
 import socket
 
+import re
 import json
 import h2.events
 import h2.config
@@ -121,4 +122,8 @@ def h2_string_decoding(in_str):
         pass
 
     return "Unknown-String"
+
+def is_valid_ip(ip):
+    m = re.match(r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$", ip)
+    return bool(m) and all(map(lambda n: 0 <= int(n) <= 255, m.groups()))
 

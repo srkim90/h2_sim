@@ -1,0 +1,24 @@
+"set autoindent
+"set cindent
+"set smartindent
+set number
+set ruler
+set sm
+set title
+set shiftwidth=4
+set tabstop=4
+set hlsearch
+set fenc=utf-8
+"set fencs=utf-8,cp949,unicode,euc-kr
+set fileencodings=utf8,euc-kr
+colo desert
+set tags=./tags,../tags,~/tags,/home/seongrae/workspace/scef/csgn/s1ap/src/tags,/home/seongrae/stock/src/tags
+set smartindent
+set tabstop=4
+set expandtab
+set shiftwidth=4 " >> 또는 << 키로 들여 쓰기 할때 스페이스의 갯수. 기본값 8
+"let g:go_version_warning = 0
+"execute pathogen#infect()
+"syntax on
+"filetype plugin indent on
+

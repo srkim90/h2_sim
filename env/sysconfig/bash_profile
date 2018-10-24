@@ -25,8 +25,6 @@ RAND_COL="\033[32m"
 GREEN_COL="\033[32m"
 COL_DIF="\033[39m"
 
-LOG_HOME="/sim/log"
-
 alias python='/sim/.util/python/Pypy2-6.0.0/bin/pypy'
 alias python3='/sim/.util/python/Python-3.5.1/python'
 alias vo='vim'
@@ -46,6 +44,15 @@ alias hhh='ls -lthr ./*.h'
 alias ccc='ls -lthr ./*.c'
 clear
 
+export PYTHONPATH=~/.util/anaconda3/lib/python3.5/site-packages:../:./.src/.core:./.src:./.src/core:./.src/.hide
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.util/python/Pypy2-6.0.0/lib
+cd ~
+export LOG_HOME="`pwd`/log"
+cd -
+
+export TARGET=~/src/main.py
+export PY3=~/.util/python/Python-3.5.1/python
+export PYPY2=~/.util/python/Pypy2-6.0.0/bin/pypy
 
 TTT=`echo -e ${GREEN_COL}H2-${RAND_COL}SIM${COL_DIF}`
 export PS1="${TTT} `id |cut -d '(' -f2 | cut -d ')' -f1 `"@' $PWD #'" "

@@ -102,13 +102,15 @@ class neoH2Connection(h2.connection.H2Connection):
         super(neoH2Connection, self).__init__(config)
 
     def _receive_frame(self, frame):
-        is_magic = False
+        is_magic   = False
+        is_preface = False
         if frame.type == FRAME_TYPE_SETTINGS:
             if self.n_inbound_setting == 0 and self.config.client_side == False:
                 is_magic = True
+                is_preface = True
             self.n_inbound_setting += 1
 
-        self.trace.h2_frame_trace(TRACE_DIR_RECV, frame, is_magic=is_magic)
+        self.trace.h2_frame_trace(TRACE_DIR_RECV, frame, is_preface=is_preface, is_magic=is_magic)
         return super(neoH2Connection, self)._receive_frame(frame)
 
     def initiate_connection(self):
@@ -244,6 +246,10 @@ class h2_base:
     count_request_client    = 0
 
     def __init__( self, LocalIP, PeerIP, LocalServicePort ,LocalNotifyPort, PeerServicePort ,PeerNotifyPort, LocalConnType, isTls, server_cert, server_key, client_certs, client_key , max_stream_id=2147383648):
+
+        if is_valid_ip(LocalIP) == False:
+            LocalIP = "0.0.0.0"
+
         self.LocalIP             = LocalIP
         self.PeerIP              = PeerIP
         self.LocalServicePort    = LocalServicePort
@@ -522,9 +528,11 @@ class h2_base:
     def h2ClientRecvTh(self, invorkCallback, IpAddr, Port, conn_type, th_index, src_ipaddr ):
         while self.isClose == False and self.__h2_check_client_exit(conn_type, th_index) == False:
             try:
-                sock = socket.create_connection((IpAddr, Port), source_address=(src_ipaddr, 0))
-                #print ("IpAddr:%s, Port=%d, src_ipaddr=%s" % (IpAddr, Port, src_ipaddr))
-                #sock = socket.create_connection((IpAddr, Port))
+                if is_valid_ip(src_ipaddr):
+                    sock = socket.create_connection((IpAddr, Port), source_address=(src_ipaddr, 0))
+                    #print ("IpAddr:%s, Port=%d, src_ipaddr=%s" % (IpAddr, Port, src_ipaddr))
+                else:
+                    sock = socket.create_connection((IpAddr, Port))
                 if self.isClose == True:
                     sock.close()
                     return
