@@ -32,6 +32,5 @@ cd ..
 rm -rf ./.tmp
 
 cd ..
-cd ..
 mv h2_sim src
 
