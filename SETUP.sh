@@ -27,10 +27,10 @@ if [ ! -d "~/.util" ]; then
     mkdir ~/.util
     mkdir ~/.util/python
 fi
+mv Pypy2-6.0.0 ~/.util/python/.
 cd ..
 rm -rf ./.tmp
 
-mv Pypy2-6.0.0 ~/.util/python/.
 cd ..
 cd ..
 mv h2_sim src
