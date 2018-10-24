@@ -1,0 +1,51 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+
+# User specific environment and startup programs
+LD_LIB64_PATH=/usr/local/lib64
+LD_LIBRARY_PATH=/usr/local/lib64
+
+PATH=$PATH:$HOME/bin
+export RTE_SDK=/root/dpdk-stable-16.11.7
+export RTE_TARGET=x86_64-native-linuxapp-gcc
+
+ulimit -c unlimited
+APP_HOME=/home/solriver/Project
+export LD_LIBRARY_PATH
+export LD_LIB64_PATH
+export APP_HOME
+export PATH
+
+RAND_COL="\033[32m"
+GREEN_COL="\033[32m"
+COL_DIF="\033[39m"
+
+LOG_HOME="/sim/log"
+
+alias python='/sim/.util/python/Pypy2-6.0.0/bin/pypy'
+alias python3='/sim/.util/python/Python-3.5.1/python'
+alias vo='vim'
+alias vi='vim'
+alias rm='rm -i'
+alias cp='cp -i'
+
+set +o vi;
+set -o emacs;
+bind '"\e[1~": beginning-of-line'
+bind '"\e[4~": end-of-line'
+export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
+alias ls='ls --color=auto'
+export TERM=xterm
+export TMOUT=900000
+alias hhh='ls -lthr ./*.h'
+alias ccc='ls -lthr ./*.c'
+clear
+
+
+TTT=`echo -e ${GREEN_COL}H2-${RAND_COL}SIM${COL_DIF}`
+export PS1="${TTT} `id |cut -d '(' -f2 | cut -d ')' -f1 `"@' $PWD #'" "

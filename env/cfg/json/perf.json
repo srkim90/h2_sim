@@ -1,0 +1,14 @@
+{
+    "AuthenticationData": {
+       "authenticationStatus": 1 ,
+       "authenticationMethod": "DIGEST",
+       "permanentKey": {
+           "authenticationCipher": 1 ,
+           "authenticationKey": "31323334....." ,
+           "authenticationOpc": "31323334....." ,
+           "authenticationAmf": "31323334"
+      } ,
+       "sequenceNumber": "31323334...." ,
+      "digestPassword": "31323334...."
+   }
+}

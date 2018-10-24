@@ -1,0 +1,4 @@
+#!/bin/bash
+
+openssl req -new -newkey rsa -days 3650 -nodes -x509 -keyout server.key -out server.crt
+openssl req -new -newkey rsa -days 3650 -nodes -x509 -keyout client.key -out client.crt
