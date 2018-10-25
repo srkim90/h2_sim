@@ -57,4 +57,7 @@ fi
 
 source ~/.bash_profile
 source ~/.bash_profile
+
 cd ~
+
+echo "re-login or source ~/.bash_profile"
