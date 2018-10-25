@@ -56,4 +56,5 @@ fi
 #su - $acccount
 
 source ~/.bash_profile
+source ~/.bash_profile
 cd ~
