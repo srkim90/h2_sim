@@ -410,7 +410,8 @@ class dispatch_util(singleton_instance):
         pram_list   = {}
 
         uri_list    = plist[0].split('/')
-        uri_list.remove("")
+        if "" in uri_list:
+            uri_list.remove("")
         uri_count = len(uri_list)
         if len (plist) > 1:
             tmp_list  = plist[1].split('&')
