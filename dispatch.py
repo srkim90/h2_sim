@@ -151,6 +151,81 @@ class __dispatch_POST_default(dispatch):
 
 
 
+class __dispatch_GET_udaf(dispatch):
+    @staticmethod
+    def run(uri_list, param_list, req_data):
+        ueId            = uri_list["ueId"]
+
+        #print("%s\n\n\n\n" % (param_list)) 
+        scfu_answer_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data>
+   <KTCSServices>
+     <KT_SCFU>2</KT_SCFU>
+     <KT_SCFUNumber>01011119999</KT_SCFUNumber>
+   </KTCSServices>
+</Sh-Data>'''
+
+        ocs_answer_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data>
+    <KTCSServices>
+      <KT_OCS>2</KT_OCS>
+      <KT_OCSNumber>01011118888</KT_OCSNumber>
+    </KTCSServices>
+</Sh-Data>'''
+
+        cfus_answer_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data>
+    <KTCSServices>
+      <KT_CFU>2</KT_CFU>
+      <KT_CFUNumber>01011119999</KT_CFUNumber>     <KT_SCFU>2</KT_SCFU>
+      <KT_SCFUNumber>01011119999</KT_SCFUNumber>
+      <KT_CFUNotiCall>1</KT_CFUNotiCall>
+    </KTCSServices>
+</Sh-Data>'''
+
+        plte_answer_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data>
+    <KTCSServices>
+      <KT_PLTE>2</KT_PLTE>
+      <KT_Reattach>1</KT_Reattach>
+    </KTCSServices>
+</Sh-Data>'''
+
+        fork_answer_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data>
+    <KTCSServices>
+      <KT_FORKM>2</KT_FORKM>
+      <KT_FORKS>2</KT_FORKS>
+    </KTCSServices>
+</Sh-Data>'''
+
+        if param_list["ServiceIndication"] == "SCFU":
+            udaf_answer_xml = scfu_answer_xml
+        elif param_list["ServiceIndication"] == "OCS":
+            udaf_answer_xml = ocs_answer_xml
+        elif param_list["ServiceIndication"] == "CFUS":
+            udaf_answer_xml = cfus_answer_xml
+        elif param_list["ServiceIndication"] == "PLTE":
+            udaf_answer_xml = plte_answer_xml
+        elif param_list["ServiceIndication"] == "FORK":
+            udaf_answer_xml = fork_answer_xml
+        else:
+            return 404, None
+
+        return 200, udaf_answer_xml
+
+
+
+class __dispatch_PATCH_udaf(dispatch):
+    @staticmethod
+    def run(uri_list, param_list, req_data):
+        ueId            = uri_list["ueId"]
+        result_data     = None #{"Origin-State-Id" : 1}
+
+        return 204, None
+
+
+
 
 
 __dispatch = ([
