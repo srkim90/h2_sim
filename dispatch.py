@@ -154,7 +154,6 @@ class __dispatch_POST_default(dispatch):
 class __dispatch_GET_udaf(dispatch):
     @staticmethod
     def run(uri_list, param_list, req_data):
-<<<<<<< HEAD
         __ueId          = uri_list["ueId"]
         builder         = payload_builder.getinstance()
 
@@ -186,7 +185,6 @@ class __dispatch_GET_udaf(dispatch):
             __data6, name6   = builder.build_VirtualServiceData(__ueId)
 
             return 200, {name1: __data1, name2: __data2, name3: __data3, name4: __data4, name5: __data5, name6: __data6 }
-=======
         ueId            = uri_list["ueId"]
 
         #print("%s\n\n\n\n" % (param_list)) 
@@ -247,8 +245,6 @@ class __dispatch_GET_udaf(dispatch):
 
         return 200, udaf_answer_xml
 
->>>>>>> 7d9f3bb083699b5c83bc20315a3fd2c86bfdf3d5
-
 
 class __dispatch_PATCH_udaf(dispatch):
     @staticmethod
@@ -260,7 +256,6 @@ class __dispatch_PATCH_udaf(dispatch):
 
 
 
-<<<<<<< HEAD
 class __dispatch_GET_from_file_example(dispatch):
     file_name           = "./h2_cfg/json/example.json" # TODO: Edit it!
     result_data         = None;
@@ -285,9 +280,6 @@ class __dispatch_PATCH_example(dispatch):
         result_data     = None
 
         return 204, result_data
-
-=======
->>>>>>> 7d9f3bb083699b5c83bc20315a3fd2c86bfdf3d5
 
 
 __dispatch = ([
