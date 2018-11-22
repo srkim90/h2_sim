@@ -154,6 +154,7 @@ class __dispatch_POST_default(dispatch):
 class __dispatch_GET_udaf(dispatch):
     @staticmethod
     def run(uri_list, param_list, req_data):
+<<<<<<< HEAD
         __ueId          = uri_list["ueId"]
         builder         = payload_builder.getinstance()
 
@@ -185,6 +186,68 @@ class __dispatch_GET_udaf(dispatch):
             __data6, name6   = builder.build_VirtualServiceData(__ueId)
 
             return 200, {name1: __data1, name2: __data2, name3: __data3, name4: __data4, name5: __data5, name6: __data6 }
+=======
+        ueId            = uri_list["ueId"]
+
+        #print("%s\n\n\n\n" % (param_list)) 
+        scfu_answer_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data>
+   <KTCSServices>
+     <KT_SCFU>2</KT_SCFU>
+     <KT_SCFUNumber>01011119999</KT_SCFUNumber>
+   </KTCSServices>
+</Sh-Data>'''
+
+        ocs_answer_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data>
+    <KTCSServices>
+      <KT_OCS>2</KT_OCS>
+      <KT_OCSNumber>01011118888</KT_OCSNumber>
+    </KTCSServices>
+</Sh-Data>'''
+
+        cfus_answer_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data>
+    <KTCSServices>
+      <KT_CFU>2</KT_CFU>
+      <KT_CFUNumber>01011119999</KT_CFUNumber>     <KT_SCFU>2</KT_SCFU>
+      <KT_SCFUNumber>01011119999</KT_SCFUNumber>
+      <KT_CFUNotiCall>1</KT_CFUNotiCall>
+    </KTCSServices>
+</Sh-Data>'''
+
+        plte_answer_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data>
+    <KTCSServices>
+      <KT_PLTE>2</KT_PLTE>
+      <KT_Reattach>1</KT_Reattach>
+    </KTCSServices>
+</Sh-Data>'''
+
+        fork_answer_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data>
+    <KTCSServices>
+      <KT_FORKM>2</KT_FORKM>
+      <KT_FORKS>2</KT_FORKS>
+    </KTCSServices>
+</Sh-Data>'''
+
+        if param_list["ServiceIndication"] == "SCFU":
+            udaf_answer_xml = scfu_answer_xml
+        elif param_list["ServiceIndication"] == "OCS":
+            udaf_answer_xml = ocs_answer_xml
+        elif param_list["ServiceIndication"] == "CFUS":
+            udaf_answer_xml = cfus_answer_xml
+        elif param_list["ServiceIndication"] == "PLTE":
+            udaf_answer_xml = plte_answer_xml
+        elif param_list["ServiceIndication"] == "FORK":
+            udaf_answer_xml = fork_answer_xml
+        else:
+            return 404, None
+
+        return 200, udaf_answer_xml
+
+>>>>>>> 7d9f3bb083699b5c83bc20315a3fd2c86bfdf3d5
 
 
 class __dispatch_PATCH_udaf(dispatch):
@@ -197,6 +260,7 @@ class __dispatch_PATCH_udaf(dispatch):
 
 
 
+<<<<<<< HEAD
 class __dispatch_GET_from_file_example(dispatch):
     file_name           = "./h2_cfg/json/example.json" # TODO: Edit it!
     result_data         = None;
@@ -222,6 +286,8 @@ class __dispatch_PATCH_example(dispatch):
 
         return 204, result_data
 
+=======
+>>>>>>> 7d9f3bb083699b5c83bc20315a3fd2c86bfdf3d5
 
 
 __dispatch = ([

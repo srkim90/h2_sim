@@ -467,8 +467,11 @@ class h2_base:
                 compressed_data = None
                 if type(json_obj) == dict:
                     byte_data = str.encode(json.dumps(json_obj))
+
                 elif type(json_obj) == str:
                     #ls_content_type = 'application/xml'
+                else:
+                    ls_content_type = 'application/xml'
                     byte_data = str.encode(json_obj)
                 if acceptDeflate == True:
                     compressed_data = zlib.compress(byte_data, 2)       
