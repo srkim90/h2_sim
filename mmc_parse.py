@@ -395,7 +395,7 @@ class mmc_parse(singleton_instance):
 
         oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
         fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
-        sleep_time = 0.015
+        sleep_time = 0.005
         n_tot_sleep = 0
         try:        
             while 1:            

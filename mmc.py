@@ -35,6 +35,7 @@ from dispatch_parse import *
 from perf_scenario import *
 from mmc_api import *
 from expect import *
+from collections import OrderedDict
 
 if int(sys.version[0]) == 3 and get_python_runtime == PYTHON_TYPE_CPYTHON:
     import tracemalloc
@@ -137,9 +138,9 @@ class __mmc_help(mmc):
         HELP_PRINT("%s" % (line80))
         HELP_PRINT("  Send HTTP/2 Request Example")
         HELP_PRINT("send request manual GET /nudr-dr/v1/subscription-data/450081060000000/authentication-data NULL", tab=2)
-        HELP_PRINT("send request manual PATCH /nudr-dr/v1/subscription-data/450081060000000/authentication-data/eps-auth-data ./cfg/json/short.json", tab=2)
+        HELP_PRINT("send request manual PATCH /nudr-dr/v1/subscription-data/450081060000000/authentication-data/eps-auth-data ./h2_cfg/json/short.json", tab=2)
         HELP_PRINT("send notify manual GET /nudr-dr/v1/subscription-data/450081060000000/authentication-data NULL", tab=2)
-        HELP_PRINT("send notify manual PATCH /nudr-dr/v1/subscription-data/450081060000000/authentication-data/eps-auth-data ./cfg/json/short.json", tab=2)
+        HELP_PRINT("send notify manual PATCH /nudr-dr/v1/subscription-data/450081060000000/authentication-data/eps-auth-data ./h2_cfg/json/short.json", tab=2)
         HELP_PRINT("")
         HELP_PRINT("  Enable or Disable HTTP/2 Trace")
         HELP_PRINT("enable log", tab=2)
@@ -148,7 +149,8 @@ class __mmc_help(mmc):
         HELP_PRINT("  Send HTTP/2 performance")
         HELP_PRINT("perf start auth_get N", tab=2)
         HELP_PRINT("perf start location_patch N", tab=2)
-        HELP_PRINT("perf start manual ./cfg/perf/perf_location.cfg N", tab=2)
+        HELP_PRINT("perf start manual ./h2_cfg/perf/perf_get_test_api.cfg N", tab=2)
+        HELP_PRINT("perf start manual ./h2_cfg/perf/perf_patch_test_api.cfg N", tab=2)
         HELP_PRINT("perf stop", tab=2)
         HELP_PRINT("")
         HELP_PRINT("  Print Information")

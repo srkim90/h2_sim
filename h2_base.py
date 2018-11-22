@@ -450,20 +450,26 @@ class h2_base:
                 json_obj = json.loads(strData)
                 #self.printFn (strData)
             except:
-                self.printFn ("JSON Decodeing Error")
+                #self.printFn ("JSON Decodeing Error")
                 #self.printFn ("%s" % strData)
-                fFail = True
+                #fFail = True
+                json_obj = None
                 pass
         
         if method == None or path == None:
             fFail = True
 
+        ls_content_type = 'application/json'
         if fFail != True:
             ErrCode, json_obj = invorkCallback(method, path, json_obj)
 
             if json_obj != None:
                 compressed_data = None
-                byte_data = str.encode(json.dumps(json_obj))
+                if type(json_obj) == dict:
+                    byte_data = str.encode(json.dumps(json_obj))
+                elif type(json_obj) == str:
+                    #ls_content_type = 'application/xml'
+                    byte_data = str.encode(json_obj)
                 if acceptDeflate == True:
                     compressed_data = zlib.compress(byte_data, 2)       
                     selectedTrEncode = "deflate"
@@ -482,7 +488,7 @@ class h2_base:
 
         if byte_data != None:
             header.append(h2_base.get_head_tuple_by_name('content-length', str(len(byte_data))))
-            header.append(h2_base.get_head_tuple_by_name('content-type'  , 'application/json'))
+            header.append(h2_base.get_head_tuple_by_name('content-type'  , ls_content_type))
             if selectedTrEncode != None:
                 header.append(h2_base.get_head_tuple_by_name('content-encoding'  , selectedTrEncode))
 
@@ -865,7 +871,8 @@ class h2_base:
                         hProcess.start()
                         '''
                     except:# (socket.error, ssl.error):
-                        self.printFn("Err, h2WaitForAcceptTh except")
+                        #self.printFn("Err, h2WaitForAcceptTh except")
+                        print("Err, h2WaitForAcceptTh except")
                         break
                 sleep(0.1)
 

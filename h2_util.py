@@ -25,6 +25,7 @@ import h2.events
 import h2.config
 import h2.connection
 import zlib
+from collections import OrderedDict
 import select
 
 FRAME_TYPE_DATA            =0
@@ -69,6 +70,23 @@ INITIAL_WINDOW_SIZE = 0x04
 MAX_FRAME_SIZE = 0x05
 MAX_HEADER_LIST_SIZE = 0x06
 
+
+def h2_load_json_from_file(json_path):
+    if json_path == None:
+        return None
+    else:
+        try:
+            json_data=open(json_path).read()
+        except FileNotFoundError:
+            print("Err. Not found JSON file : %s" % (json_path))
+            return None
+        try:
+            data = json.loads(json_data, object_pairs_hook=OrderedDict)
+        except Exception as e:
+            print("Err. Fail to parsing JSON : reason=%s, file_name=%s, data=%s" % (e, json_path, json_data))
+            return None
+    return json.dumps(data)
+   
 
 def h2_setting_string(enum_setting):
     if enum_setting == HEADER_TABLE_SIZE:

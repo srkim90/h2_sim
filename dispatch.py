@@ -31,7 +31,7 @@ from sim_exit import *
 from h2_util import *
 from h2_trace import *
 from random import *
-
+from mmc_build_payload import * 
 
 '''
     <examples>
@@ -151,6 +151,77 @@ class __dispatch_POST_default(dispatch):
 
 
 
+class __dispatch_GET_udaf(dispatch):
+    @staticmethod
+    def run(uri_list, param_list, req_data):
+        __ueId          = uri_list["ueId"]
+        builder         = payload_builder.getinstance()
+
+        if "fields" in param_list:
+            __type =param_list["fields"]
+
+            if __type == "BasicServiceData":
+                __data, name   = builder.build_BasicServiceData(__ueId)
+            elif __type == "CFServiceData":
+                __data, name   = builder.build_CFServiceData(__ueId)
+            elif __type == "SNDServiceData":
+                __data, name   = builder.build_SNDServiceData(__ueId)
+            elif __type == "ImsServiceData":
+                __data, name   = builder.build_ImsServiceData(__ueId)
+            elif __type == "InServiceData":
+                __data, name   = builder.build_InServiceData(__ueId)
+            elif __type == "VirtualServiceData":
+                __data, name   = builder.build_VirtualServiceData(__ueId)
+            else:
+                PRINT("Invalid input MMC : %s" % command)
+                return 404, None
+            return 200, {name : __data}
+        else:
+            __data1, name1   = builder.build_BasicServiceData(__ueId)
+            __data2, name2   = builder.build_CFServiceData(__ueId)
+            __data3, name3   = builder.build_SNDServiceData(__ueId)
+            __data4, name4   = builder.build_ImsServiceData(__ueId)
+            __data5, name5   = builder.build_InServiceData(__ueId)
+            __data6, name6   = builder.build_VirtualServiceData(__ueId)
+
+            return 200, {name1: __data1, name2: __data2, name3: __data3, name4: __data4, name5: __data5, name6: __data6 }
+
+
+class __dispatch_PATCH_udaf(dispatch):
+    @staticmethod
+    def run(uri_list, param_list, req_data):
+        ueId            = uri_list["ueId"]
+        result_data     = None #{"Origin-State-Id" : 1}
+
+        return 204, None
+
+
+
+class __dispatch_GET_from_file_example(dispatch):
+    file_name           = "./h2_cfg/json/example.json" # TODO: Edit it!
+    result_data         = None;
+    @classmethod
+    def run(cls, uri_list, param_list, req_data):
+        __ueId          = uri_list["ueId"]
+        __result_code   = 200
+
+        if cls.result_data == None and cls.file_name != None:
+            cls.result_data = h2_load_json_from_file(cls.file_name)
+
+        if cls.result_data == None:
+            return 404, None
+
+        return 200, cls.result_data
+
+
+class __dispatch_PATCH_example(dispatch):
+    @staticmethod
+    def run(uri_list, param_list, req_data):
+        ueId            = uri_list["ueId"]
+        result_data     = None
+
+        return 204, result_data
+
 
 
 __dispatch = ([
@@ -168,18 +239,24 @@ __dispatch = ([
                [ "as-notify-data"          , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/ims-am-data/as-notify-data"                                 , __dispatch_GET_default                     ],
                [ "cscf-restore-data"       , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/ims-am-data/cscf-restore-data"                              , __dispatch_GET_default                     ],
                [ "location-data"           , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/location-data"                                              , __dispatch_GET_default                     ],
-               [ "supplement-service-data" , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/supplement-service-data"                                    , __dispatch_GET_default                     ],
+               [ "supplement-service-data" , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/supplement-service-data"                                    , __dispatch_GET_udaf                        ],
                [ "eps-auth-data"           , "PATCH"  , "/nudr-dr/v1/subscription-data/{ueId}/authentication-data/eps-auth-data"                          , __dispatch_PATCH_default                   ],
                [ "ims-auth-data"           , "PATCH"  , "/nudr-dr/v1/subscription-data/{ueId}/authentication-data/ims-auth-data"                          , __dispatch_PATCH_default                   ],
                [ "wifi-auth-data"          , "PATCH"  , "/nudr-dr/v1/subscription-data/{ueId}/authentication-data/wifi-auth-data"                         , __dispatch_PATCH_default                   ],
                [ "location-data"           , "PATCH"  , "/nudr-dr/v1/subscription-data/{ueId}/location-data"                                              , __dispatch_PATCH_default                   ],
-               [ "supplement-service-data" , "PATCH"  , "/nudr-dr/v1/subscription-data/{ueId}/supplement-service-data"                                    , __dispatch_PATCH_default                   ],
+               [ "supplement-service-data" , "PATCH"  , "/nudr-dr/v1/subscription-data/{ueId}/supplement-service-data"                                    , __dispatch_PATCH_udaf                      ],
                [ "active-apn-data"         , "POST"   , "/nudr-dr/v1/subscription-data/{ueId}/eps-am-data/active-apn-data/{apnContextId}"                 , __dispatch_POST_default                    ],
                [ "as-notify-data"          , "POST"   , "/nudr-dr/v1/subscription-data/{ueId}/ims-am-data/as-notify-data/{asGroupId}/{dataReferenceId}"   , __dispatch_POST_default                    ],
                [ "cscf-restore-data"       , "POST"   , "/nudr-dr/v1/subscription-data/{ueId}/ims-am-data/cscf-restore-data/{imsPrivateUserId}"           , __dispatch_POST_default                    ],
                [ "active-apn-data"         , "PUT"    , "/nudr-dr/v1/subscription-data/{ueId}/eps-am-data/active-apn-data/{apnContextId}"                 , __dispatch_PUT_default                     ],
                [ "as-notify-data"          , "PUT"    , "/nudr-dr/v1/subscription-data/{ueId}/ims-am-data/as-notify-data/{asGroupId}/{dataReferenceId}"   , __dispatch_PUT_default                     ],
                [ "cscf-restore-data"       , "PUT"    , "/nudr-dr/v1/subscription-data/{ueId}/ims-am-data/cscf-restore-data/{imsPrivateUserId}"           , __dispatch_PUT_default                     ],
+               [ "hlr-user-data"           , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/hlr-user-data"                                              , __dispatch_GET_udaf                        ],
+               [ "hlr-user-data"           , "PATCH"  , "/nudr-dr/v1/subscription-data/{ueId}/hlr-user-data"                                              , __dispatch_PATCH_udaf                      ],
+
+             # TEST-APIs
+               [ "test-api"                , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/test-api"                                                   , __dispatch_GET_from_file_example           ],
+               [ "test-api"                , "PATCH"  , "/nudr-dr/v1/subscription-data/{ueId}/test-api"                                                   , __dispatch_PATCH_example                   ],
               ])
 
 def init_dispatch():
