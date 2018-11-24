@@ -173,7 +173,7 @@ class __dispatch_GET_udaf(dispatch):
             elif __type == "VirtualServiceData":
                 __data, name   = builder.build_VirtualServiceData(__ueId)
             else:
-                PRINT("Invalid input MMC : %s" % command)
+                PRINT("Invalid input Type : %s" % __type)
                 return 404, None
             return 200, {name : __data}
         else:
