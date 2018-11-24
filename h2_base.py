@@ -470,6 +470,7 @@ class h2_base:
 
                 elif type(json_obj) == str:
                     #ls_content_type = 'application/xml'
+                    byte_data = str.encode(json_obj)
                     pass
                 else:
                     ls_content_type = 'application/xml'
