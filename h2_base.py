@@ -101,6 +101,27 @@ class neoH2Connection(h2.connection.H2Connection):
         self.trace         = h2_trace.getinstance()
         super(neoH2Connection, self).__init__(config)
 
+    def _open_streams(self, remainder):
+        """
+        A common method of counting number of open streams. Returns the number
+        of streams that are open *and* that have (stream ID % 2) == remainder.
+        While it iterates, also deletes any closed streams.
+        """
+        n_closed_streams=len(self._closed_streams)
+    
+        N_THRESHOLD_REMAIN_CLOSED_STREAM = 250000
+        
+        if n_closed_streams > N_THRESHOLD_REMAIN_CLOSED_STREAM:
+            n_del_count = N_THRESHOLD_REMAIN_CLOSED_STREAM / 3
+            #print("Count of closed_streams reached MAX(%d). Try delete %d" % (n_closed_streams, n_del_count))
+            for n_deleted, item in enumerate(self._closed_streams.keys()):
+                del self._closed_streams[item]
+                if n_deleted >= n_del_count:
+                    break
+
+        count = super(neoH2Connection, self)._open_streams(remainder)
+        return count
+
     def _receive_frame(self, frame):
         is_magic   = False
         is_preface = False
