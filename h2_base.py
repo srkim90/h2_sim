@@ -101,28 +101,6 @@ class neoH2Connection(h2.connection.H2Connection):
         self.trace         = h2_trace.getinstance()
         super(neoH2Connection, self).__init__(config)
 
-    def _open_streams(self, remainder):
-        """
-        hyper-h2 stack에서는 이미 Close 된 Stream을 저장하여, 이후에 동일한 Connection에 대하여 
-        해당 Stram으로 Request가 다시 들어 올 경우 Request를 Abort 하는 기능이 있습니다.
-        하지만, 해당 기능은 Connection을 유지하는 시뮬레이터에서는 메모리 증가 이슈가 있어 사용하기 
-        부적합하다고 판단 됩니다. 따라서 해당 기능은 본 함수를 Overriding 하여 Closed stream을 최대 
-        250000개 까지만 저장 하도록 변경 하였습니다.
-        """
-        n_closed_streams=len(self._closed_streams)
-    
-        N_THRESHOLD_REMAIN_CLOSED_STREAM = 250000
-        
-        if n_closed_streams > N_THRESHOLD_REMAIN_CLOSED_STREAM:
-            n_del_count = N_THRESHOLD_REMAIN_CLOSED_STREAM / 3
-            #print("Count of closed_streams reached MAX(%d). Try delete %d (%d byte)" % (n_closed_streams, n_del_count, len(self._closed_streams)/3))
-            for n_deleted, item in enumerate(self._closed_streams.keys()):
-                del self._closed_streams[item]
-                if n_deleted >= n_del_count:
-                    break
-
-        count = super(neoH2Connection, self)._open_streams(remainder)
-        return count
 
     def _receive_frame(self, frame):
         is_magic   = False
