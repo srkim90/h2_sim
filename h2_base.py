@@ -101,7 +101,11 @@ class neoH2Connection(h2.connection.H2Connection):
         self.trace         = h2_trace.getinstance()
         super(neoH2Connection, self).__init__(config)
 
-     #srkim : 20181123
+<<<<<<< HEAD
+    #srkim : 20181123
+=======
+    # srkim : 20181123
+>>>>>>> b11541c4f04fbe4f5e9cb0911d69098c1ae2fc2e
     def _open_streams(self, remainder):
         """
         hyper-h2 stack에서는 이미 Close 된 Stream을 저장하여, 이후에 동일한 Connection에 대하여해당 
@@ -116,7 +120,11 @@ class neoH2Connection(h2.connection.H2Connection):
        
         if n_closed_streams > N_THRESHOLD_REMAIN_CLOSED_STREAM:
             n_del_count = N_THRESHOLD_REMAIN_CLOSED_STREAM / 3
+<<<<<<< HEAD
            #print("Count of closed_streams reached MAX(%d). Try delete %d (%d byte)" % (n_closed_streams, n_del_count, len(self._closed_streams)/3))
+=======
+           #print("Count of closed_streams reached MAX(%d). Try delete %d (%d byte)" % (n_closed_streams, n_del_count, len(self._closed_streams)/3))
+>>>>>>> b11541c4f04fbe4f5e9cb0911d69098c1ae2fc2e
             for n_deleted, item in enumerate(self._closed_streams.keys()):
                 del self._closed_streams[item]
                 if n_deleted >= n_del_count:
