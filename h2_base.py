@@ -101,19 +101,22 @@ class neoH2Connection(h2.connection.H2Connection):
         self.trace         = h2_trace.getinstance()
         super(neoH2Connection, self).__init__(config)
 
+     #srkim : 20181123
     def _open_streams(self, remainder):
         """
-        A common method of counting number of open streams. Returns the number
-        of streams that are open *and* that have (stream ID % 2) == remainder.
-        While it iterates, also deletes any closed streams.
+        hyper-h2 stack에서는 이미 Close 된 Stream을 저장하여, 이후에 동일한 Connection에 대하여해당 
+        Stram으로 Request가 다시 들어 올 경우 Request를 Abort 하는 기능이 있습니다. 하지만, 해당 기
+        능은 Connection을 유지하는 시뮬레이터에서는 메모리 증가 이슈가 있어 사용하기 부적합하다고판
+        단 됩니다. 따라서 해당 기능은 본 함수를 Overriding 하여 Closed stream을 최대 250000개 까지만
+        저장 하도록 변경 하였습니다.
         """
         n_closed_streams=len(self._closed_streams)
     
         N_THRESHOLD_REMAIN_CLOSED_STREAM = 250000
-        
+       
         if n_closed_streams > N_THRESHOLD_REMAIN_CLOSED_STREAM:
             n_del_count = N_THRESHOLD_REMAIN_CLOSED_STREAM / 3
-            #print("Count of closed_streams reached MAX(%d). Try delete %d" % (n_closed_streams, n_del_count))
+           #print("Count of closed_streams reached MAX(%d). Try delete %d (%d byte)" % (n_closed_streams, n_del_count, len(self._closed_streams)/3))
             for n_deleted, item in enumerate(self._closed_streams.keys()):
                 del self._closed_streams[item]
                 if n_deleted >= n_del_count:
@@ -121,6 +124,7 @@ class neoH2Connection(h2.connection.H2Connection):
 
         count = super(neoH2Connection, self)._open_streams(remainder)
         return count
+
 
     def _receive_frame(self, frame):
         is_magic   = False
@@ -287,7 +291,24 @@ class h2_base:
             self.client_key     = client_key
         self.set_tps_stat      = dispatch_util.getinstance().set_tps_stat
         self.set_base_stat      = dispatch_util.getinstance().set_base_stat
-        
+
+    def h2_sendall(self, sock, data):
+        """
+        Writes data to a socket and does not return until all the data is sent.
+        """
+        length = len(data)
+        while length:
+            try:
+                sent = sock.send(data)
+            except socket.error, e:
+                if e[0] == errno.EAGAIN:
+                    select.select([], [sock], [])
+                    continue
+                else:
+                    raise
+            data = data[sent:]
+            length -= sent        
+
     def h2_set_print_method(self, fn):
         self.printFn = fn
 
@@ -638,7 +659,7 @@ class h2_base:
             #http2_connection.encoder.header_table_size = n_sz_hdr_table
 
             http2_connection.initiate_connection()
-            sock.sendall(http2_connection.data_to_send())
+            self.h2_sendall(sock, http2_connection.data_to_send())
         except Exception as e:
             self.printFn("Error!! Fail to initiate_connection : %s\n" % (e))
             sock.close()
@@ -797,7 +818,7 @@ class h2_base:
                     data_to_send = http2_connection.data_to_send()
                     if data_to_send:
                         try:
-                            sock.sendall(data_to_send)
+                            self.h2_sendall(sock, data_to_send)
                         except:# (socket.error, ssl.error):
                             self._h2_connection_close(conn_type, scheme, conn_side, peer_ipaddr, peer_port, __sock, sock, None, 0, None, th_index)
                             conn_lock.release()
@@ -839,7 +860,7 @@ class h2_base:
             data_to_send = http2_connection.data_to_send()
             if data_to_send:
                 try:
-                    sock.sendall(data_to_send)
+                    self.h2_sendall(sock, data_to_send)
                 except:# (socket.error, ssl.error):
                     self._h2_connection_close(conn_type, scheme, conn_side, peer_ipaddr, peer_port, __sock, sock, None, 0, None, th_index)
                     conn_lock.release()
@@ -853,7 +874,7 @@ class h2_base:
     def h2_send_ping(self, opaque_data, sock, http2_connection):
         http2_connection.ping(str(opaque_data).encode('utf-8'))
         try:
-            sock.sendall(http2_connection.data_to_send())
+            self.h2_sendall(sock, http2_connection.data_to_send())
         except:# (socket.error, ssl.error):
             self.printFn("Err. Fail to send PING")
             return False
@@ -1134,7 +1155,7 @@ class h2_base:
         #SET_TIMEIT(l_timeit)
         if data_to_send:
             try:
-                sock.sendall(data_to_send)
+                self.h2_sendall(sock, data_to_send)
             except:
                 self.printFn("Error. sendall fail")
                 conn_lock.release()
@@ -1240,7 +1261,7 @@ class h2_base:
         data_to_send = h2_conn.data_to_send()
         if data_to_send:
             try:
-                sock.sendall(data_to_send)
+                self.h2_sendall(sock, data_to_send)
             except:
                 self.printFn("Error. sendall fail")
                 conn_lock.release()
@@ -1355,7 +1376,7 @@ class h2_base:
         try:
             if h2_conn != None:
                 h2_conn.close_connection(error_code=error_code, additional_data=__error_reason)
-                sock.sendall(h2_conn.data_to_send())
+                self.h2_sendall(sock, h2_conn.data_to_send())
             sock.close()
             if self.isTls == True:
                 org_sock.close()
