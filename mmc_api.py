@@ -44,7 +44,7 @@ def mmc_append(e):
     global __api_mmc
     __api_mmc.append(e)
 
-def get_api():
+def get_request_api():
     return __api_mmc
 
 def send_request(command, path, method, data):

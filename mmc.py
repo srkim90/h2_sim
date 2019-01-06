@@ -132,6 +132,12 @@ class mmc_log_set(mmc):
 
 
 class __mmc_help(mmc):
+
+    @classmethod
+    def get_notify_conn_cnt(cls):
+        iwk = h2_interwork.getinstance()
+        return iwk.get_connection_count(1)
+
     @classmethod
     def print_notify_command(cls):
         HELP_PRINT("send notify subscriber_id_data {ueId} GET", tab=2)
@@ -293,9 +299,13 @@ class __mmc_help(mmc):
         HELP_PRINT("show data_cfg", tab=2)
         HELP_PRINT("show stat", tab=2)
         HELP_PRINT("")
-        HELP_PRINT("  Example commands (ALL)")
-        cls.print_notify_command()
-        #cls.print_request_command()
+
+        if cls.get_notify_conn_cnt() > 0:
+            HELP_PRINT("  Example commands (Notify)")
+            cls.print_notify_command()
+        else:
+            HELP_PRINT("  Example commands (Request)")
+            cls.print_request_command()
 
         HELP_PRINT("")
         HELP_PRINT("  Example batch")
@@ -758,7 +768,8 @@ __mmc = [
           ["from_file",           2, "batch-start-from_file"                 , None                          ],
           ["batch_path",          3, "batch-start-from_file-S"               , __mmc_run_batch               ],
          ]
-__mmc.extend( get_api() )
+__mmc.extend( get_request_api() )
+__mmc.extend( get_notify_api() )
 
 
 def mmc_run(index, name):

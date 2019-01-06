@@ -257,7 +257,8 @@ class __dispatch_PATCH_udaf(dispatch):
 
 
 class __dispatch_GET_from_file_example(dispatch):
-    file_name           = "./h2_cfg/json/example.json" # TODO: Edit it!
+    #file_name           = "./h2_cfg/json/example.json" # TODO: Edit it!
+    file_name           = "./h2_cfg/json/perf2.json" # TODO: Edit it!
     result_data         = None;
     @classmethod
     def run(cls, uri_list, param_list, req_data):
