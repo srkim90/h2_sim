@@ -485,7 +485,7 @@ class h2_base:
             fData = zlib.decompress(fData)
 
         if fData != None:
-            strData = fData.decode(encoding="utf-8")
+            #strData = fData.decode(encoding="utf-8")
             #json_obj = json.loads(strData)
             try:
                 strData = fData.decode(encoding="utf-8")
