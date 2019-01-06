@@ -133,8 +133,25 @@ class perf_scenario(singleton_instance):
             sleep(HZ)
     '''
 
+    def __get_perf_fn(self, iwk):
+        if 0 < iwk.get_connection_count(0): # check request connection ls alive?
+            perf_fn = iwk.h2_send_request
+        elif 0 < iwk.get_connection_count(1): # check notify connection ls alive?
+            perf_fn = iwk.h2_send_notify
+        else:
+            PRINT("%s%sError. There is no client connection!!%s" % (C_BOLD, C_RED, C_END))
+            PRINT("%s%sError. There is no client connection!!%s" % (C_BOLD, C_GREEN, C_END))
+            PRINT("%s%sError. There is no client connection!!%s" % (C_BOLD, C_YELLOW, C_END))
+            PRINT("%s%sError. There is no client connection!!%s" % (C_BOLD, C_BLUE, C_END))
+            PRINT("%s%sError. There is no client connection!!%s" % (C_BOLD, C_PURPLE, C_END))
+            return None
+        return perf_fn
+
     def __perf_scenario_from_config_file(self, count, HZ, TPS, iwk, perf, additional_opt=None):
         # begin init
+        perf_fn = self.__get_perf_fn(iwk)
+        if perf_fn == None:
+            return
         if additional_opt["json"] != None:
             #print(type(additional_opt["json"]))
             data = json.dumps(additional_opt["json"])
@@ -162,7 +179,7 @@ class perf_scenario(singleton_instance):
                 uri    = h_path
 
             while True:
-                if iwk.h2_send_request(h_method, uri, data) == 0 :
+                if perf_fn(h_method, uri, data) == 0 :
                     sleep(HZ * 1.0)
                 else:
                     break
@@ -173,15 +190,18 @@ class perf_scenario(singleton_instance):
 
     def __perf_scenario_auth_get(self, count, HZ, TPS, iwk, perf, additional_opt=None):
         # TODO: init
+        perf_fn = self.__get_perf_fn(iwk)
+        if perf_fn == None:
+            return
         for i in range(count):
             self.__tps_ctl(HZ, TPS, is_start=True)
             if perf.is_close != False:
                 break;
             ## Start add
-
             uri = "/nudr-dr/v1/subscription-data/%s%06d/authentication-data" % (perf.imsi_prefix, perf.start_sub + (i%perf.max_sub))
+
             while True:
-                if iwk.h2_send_request("GET", uri, None) == 0 :
+                if perf_fn("GET", uri, None) == 0 :
                     sleep(HZ * 1.0)
                 else:
                     break
@@ -192,6 +212,9 @@ class perf_scenario(singleton_instance):
 
     def __perf_scenario_location_patch(self, count, HZ, TPS, iwk, perf, additional_opt=None):
         # begin init
+        perf_fn = self.__get_perf_fn(iwk)
+        if perf_fn == None:
+            return
         data  = {}
         build = builder()
         ueId  = None
@@ -216,7 +239,7 @@ class perf_scenario(singleton_instance):
             uri    = "/nudr-dr/v1/subscription-data/%s/location-data" % (ueId)
 
             while True:
-                if iwk.h2_send_request("PATCH", uri, data) != True :
+                if perf_fn("PATCH", uri, data) != True :
                     sleep(HZ * 1.0)
                 else:
                     break

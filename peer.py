@@ -132,6 +132,18 @@ class h2_peer(singleton_instance):
 
         return target_peer_list
 
+    def get_connection_count(self, request_type=0):
+        if request_type == 0:
+            request_type = h2_conn_type.CONNTYPE_CLIENT_REQUEST
+        else:
+            request_type = h2_conn_type.CONNTYPE_CLIENT_NOTIFY
+
+        nErr = 0
+        for peer in self.h2_peer_list:
+            nErr += peer.h2_get_conn_cnt(request_type)
+
+        return nErr
+
     def _send_message(self, request_type, method, uri, json_object, n_request=1):
         target_peer_list = []
         for peer in self.h2_peer_list:

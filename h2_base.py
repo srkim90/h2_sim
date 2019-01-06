@@ -330,7 +330,7 @@ class h2_base:
 
  
     def h2OpenClient(self, clientResumeCallback, nConnection=3):
-        nNotiConnection          = 2
+        nNotiConnection          = 1
         self.conn_notify_max     = nNotiConnection
         self.conn_request_max    = nConnection
 

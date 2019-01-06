@@ -112,6 +112,10 @@ class h2_interwork(singleton_instance):
 
         return None
 
+    def get_connection_count(self, request_type):
+        peer = h2_peer.getinstance()
+        return peer.get_connection_count(request_type)
+        
 
     def h2_send_request(self, method, uri, data, n_request=1):
         peer = h2_peer.getinstance()
