@@ -150,6 +150,16 @@ class __dispatch_POST_default(dispatch):
         return 201, None
 
 
+class __dispatch_GET_auth(dispatch):
+    @staticmethod
+    def run(uri_list, param_list, req_data):
+        builder         = payload_builder.getinstance()
+        ueId            = uri_list["ueId"]
+
+        __data1, name1  = builder.build_AuthEpsData(ueId)
+
+        return 200, {name1: __data1}
+
 
 class __dispatch_GET_udaf(dispatch):
     @staticmethod
@@ -291,7 +301,7 @@ __dispatch = ([
                [ "active-apn-data"         , "DELETE" , "/nudr-dr/v1/subscription-data/{ueId}/eps-am-data/active-apn-data/{apnContextId}"                 , __dispatch_DELETE_default                  ],
                [ "as-notify-data"          , "DELETE" , "/nudr-dr/v1/subscription-data/{ueId}/ims-am-data/as-notify-data/{asGroupId}/{dataReferenceId}"   , __dispatch_DELETE_default                  ],
                [ "cscf-restore-data"       , "DELETE" , "/nudr-dr/v1/subscription-data/{ueId}/ims-am-data/cscf-restore-data"                              , __dispatch_DELETE_default                  ],
-               [ "authentication-data"     , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/authentication-data"                                        , __dispatch_GET_default                     ],
+               [ "authentication-data"     , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/authentication-data"                                        , __dispatch_GET_auth                        ],
                [ "eps-am-data"             , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/eps-am-data"                                                , __dispatch_GET_default                     ],
                [ "active-apn-data"         , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/eps-am-data/active-apn-data"                                , __dispatch_GET_default                     ],
                [ "ims-am-data"             , "GET"    , "/nudr-dr/v1/subscription-data/{ueId}/ims-am-data"                                                , __dispatch_GET_default                     ],
